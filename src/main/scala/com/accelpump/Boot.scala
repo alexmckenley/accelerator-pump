@@ -48,6 +48,6 @@ object AcceleratorPump {
   def startHttpServer(): Future[Unit] = {
     import system.dispatcher
     val apiService = AcceleratorPump.system.actorOf(Props[ApiServiceActor], "api-service")
-    (IO(Http) ? Http.Bind(apiService, interface = "localhost", port = 8080)).map(_ => Unit)
+    (IO(Http) ? Http.Bind(apiService, interface = "localhost", port = 8008)).map(_ => Unit)
   }
 }
