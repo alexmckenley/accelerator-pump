@@ -9,7 +9,7 @@ import akka.actor._
 class ProjectDbClient(implicit system: ActorSystem) {
   implicit val ec = system.dispatcher
 
-  val hashids = Hashids("I NEED MORE SALT!", 8)
+  val hashids = Hashids("Like leaves, falling from trees...")
 
   def mapProjects(rs: WrappedResultSet): Project = {
     Project(Some(hashids.encode(rs.int("id"))), rs.string("name"), rs.string("namespace"))

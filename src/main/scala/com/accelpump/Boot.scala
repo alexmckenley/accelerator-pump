@@ -24,7 +24,7 @@ object Boot extends App {
   val projectDb = new ProjectDbClient()(AcceleratorPump.system)
 
   for {
-    newProject <- projectDb.createProject(Project(None, "alex", "talorr"))
+    newProject <- projectDb.createProject(Project(None, "alex", "talrr"))
     allProjects <- projectDb.getProjects()
   } yield println(newProject, allProjects)
 }
