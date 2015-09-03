@@ -1,31 +1,56 @@
 package com.accelpump
 
 import scalikejdbc._
+import org.hashids._
+import scala.concurrent._
+import scala.concurrent.duration._
+import akka.actor._
 
-class ProjectDbClient {
-  def createProject(project: Project) = {
-    DB localTx { implicit session =>
-      sql"insert into projects (id, name, namespace) values (DEFAULT, ${project.name}, ${project.namespace})"
-        .update
-        .apply()
+class ProjectDbClient(implicit system: ActorSystem) {
+  implicit val ec = system.dispatcher
+
+  val hashids = Hashids("I NEED MORE SALT!", 8)
+
+  def mapProjects(rs: WrappedResultSet): Project = {
+    Project(Some(hashids.encode(rs.int("id"))), rs.string("name"), rs.string("namespace"))
+  }
+
+  def createProject(project: Project): Future[Option[Project]] = Future {
+    blocking {
+      project.id match {
+        case Some(_) => None
+        case None =>  {
+          val id = DB localTx { implicit session =>
+            sql"insert into projects (name, namespace) values (${project.name}, ${project.namespace})"
+              .updateAndReturnGeneratedKey
+              .apply()
+          }
+
+          Await.result(getProject(hashids.encode(id)), 5 seconds)
+        }
+      }
     }
   }
 
-  def getProject(id: Int): Option[Project] = {
-    DB.readOnly { implicit session =>
-      sql"select * from projects where id=$id"
-        .map(Project(_))
-        .single
-        .apply();
+  def getProject(id: String): Future[Option[Project]] = Future {
+    blocking {
+      DB.readOnly { implicit session =>
+        sql"select * from projects where id=${hashids.decode(id)}"
+          .map(mapProjects)
+          .single
+          .apply();
+      }
     }
   }
 
-  def getProjects(): List[Project] = {
-    DB.readOnly { implicit session =>
-      sql"select * from projects"
-        .map(Project(_))
-        .list
-        .apply();
+  def getProjects(): Future[List[Project]] = Future {
+    blocking {
+      DB.readOnly { implicit session =>
+        sql"select * from projects"
+          .map(mapProjects)
+          .list
+          .apply();
+      }
     }
   }
 }

@@ -15,7 +15,7 @@ trait ApiService extends HttpService {
   val apiRoutes =
     path("") {
       get {
-        complete(Project(1, "ammo", "ammo"))
+        complete(Project(Some(1.toString), "ammo", "ammo"))
       }
     }
 }

@@ -6,6 +6,8 @@ scalaVersion  := "2.11.7"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
+resolvers += "dl-john-ky" at "http://dl.john-ky.io/maven/releases"
+
 libraryDependencies ++= {
   val scalikejdbcV = "2.2.8"
   val akkaV = "2.3.9"
@@ -23,7 +25,8 @@ libraryDependencies ++= {
     "io.spray"            %%  "spray-json"            % "1.3.2",
     "com.typesafe.akka"   %%  "akka-actor"            % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"          % akkaV   % "test",
-    "org.specs2"          %%  "specs2-core"           % "2.3.11" % "test"
+    "org.specs2"          %%  "specs2-core"           % "2.3.11" % "test",
+    "io.john-ky"          %%  "hashids-scala"         % "1.1.0-448df98"
   )
 }
 

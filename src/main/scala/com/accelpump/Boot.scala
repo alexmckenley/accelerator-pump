@@ -10,6 +10,7 @@ import scala.concurrent.duration._
 import scalikejdbc.config._
 
 object Boot extends App {
+  implicit val ec = AcceleratorPump.system.dispatcher
 
   AcceleratorPump.initialize()
   AcceleratorPump.system.log.info("Booting AcceleratorPump...")
@@ -20,8 +21,12 @@ object Boot extends App {
       AcceleratorPump.system.shutdown()
   }(AcceleratorPump.system.dispatcher)
 
-  val projectDb = new ProjectDbClient()
-  println(projectDb.getProject(34))
+  val projectDb = new ProjectDbClient()(AcceleratorPump.system)
+
+  for {
+    newProject <- projectDb.createProject(Project(None, "alex", "talorr"))
+    allProjects <- projectDb.getProjects()
+  } yield println(newProject, allProjects)
 }
 
 object AcceleratorPump {
