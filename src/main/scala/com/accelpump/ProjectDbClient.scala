@@ -1,9 +1,8 @@
 package com.accelpump
 
 import scalikejdbc._
-import akka.actor._
 
-class ProjectDbClient(implicit system: ActorSystem) {
+class ProjectDbClient {
   def createProject(project: Project) = {
     DB localTx { implicit session =>
       sql"insert into projects (id, name, namespace) values (DEFAULT, ${project.name}, ${project.namespace})"

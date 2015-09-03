@@ -20,7 +20,7 @@ object Boot extends App {
       AcceleratorPump.system.shutdown()
   }(AcceleratorPump.system.dispatcher)
 
-  val projectDb = new ProjectDbClient()(AcceleratorPump.system)
+  val projectDb = new ProjectDbClient()
   println(projectDb.getProject(34))
 }
 
