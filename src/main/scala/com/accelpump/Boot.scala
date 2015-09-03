@@ -7,7 +7,6 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent._
 import scala.concurrent.duration._
-import scalikejdbc._
 import scalikejdbc.config._
 
 object Boot extends App {
@@ -21,12 +20,8 @@ object Boot extends App {
       AcceleratorPump.system.shutdown()
   }(AcceleratorPump.system.dispatcher)
 
-  val projects = DB readOnly { implicit session =>
-    sql"select * from projects".map(rs => (rs.string("name"), rs.long("id"))).list.apply()
-  }
-
-  println(projects)
-
+  val projectDb = new ProjectDbClient()(AcceleratorPump.system)
+  println(projectDb.getProject(34))
 }
 
 object AcceleratorPump {
